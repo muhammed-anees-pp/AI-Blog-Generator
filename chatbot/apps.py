@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class BlogGeneratorConfig(AppConfig):
+class ChatbotConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'blog_generator'
+    name = 'chatbot'
