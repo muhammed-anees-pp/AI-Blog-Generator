@@ -291,13 +291,23 @@
     <div class="chat-header">
       <div class="chat-avatar">AI</div>
       <h2 class="chat-header-title">AI Assistant</h2>
-      {% if user.is_authenticated %}
-        <span style="margin-left: auto;">Hello, {{ user.first_name }} | <a href="{% url 'logout' %}">Logout</a></span>
-      {% else %}
-        <span style="margin-left: auto;"><a href="{% url 'login' %}">Login</a> | <a href="{% url 'signup' %}">Sign Up</a></span>
-      {% endif %}
     </div>
-    <!-- Rest of your template remains the same -->
+    
+    <div class="messages-box">
+      <ul class="messages-list">
+        <li class="message received">
+          <div class="message-text">
+            <div class="message-sender">
+              <b>AI Assistant</b>
+            </div>
+            <div class="message-content">
+              Hi, I am your AI Assistant, you can ask me anything.
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    
     <div class="chat-footer">
       <form class="message-form">
         {% csrf_token %}
@@ -313,145 +323,142 @@
   </div>
 </div>
 
-
-
 <script>
-  const messagesList = document.querySelector('.messages-list');
-  const messageForm = document.querySelector('.message-form');
-  const messageInput = document.querySelector('.message-input');
-  const messagesBox = document.querySelector('.messages-box');
+    const messagesList = document.querySelector('.messages-list');
+    const messageForm = document.querySelector('.message-form');
+    const messageInput = document.querySelector('.message-input');
+    const messagesBox = document.querySelector('.messages-box');
 
-  // Function to scroll to the bottom of the messages
-  function scrollToBottom() {
-    messagesBox.scrollTop = messagesBox.scrollHeight;
-  }
-
-  // Initial scroll to bottom
-  scrollToBottom();
-
-  // Auto-resize input field as user types
-  messageInput.addEventListener('input', function() {
-    this.style.height = 'auto';
-    this.style.height = (this.scrollHeight < 120 ? this.scrollHeight : 120) + 'px';
-  });
-
-  // Format timestamp
-  function formatTime() {
-    const now = new Date();
-    return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
-
-  messageForm.addEventListener('submit', (event) => {
-    event.preventDefault();
-
-    const message = messageInput.value.trim();
-    if (message.length === 0) {
-      return;
+    // Function to scroll to the bottom of the messages
+    function scrollToBottom() {
+      messagesBox.scrollTop = messagesBox.scrollHeight;
     }
 
-    const time = formatTime();
-    const messageItem = document.createElement('li');
-    messageItem.classList.add('message', 'sent', 'new-message');
-    messageItem.innerHTML = `
-        <div class="message-text">
-            <div class="message-sender">
-                <b>You</b>
-            </div>
-            <div class="message-content">
-                ${message}
-            </div>
-            <div class="message-footer">${time}</div>
-        </div>`;
-    messagesList.appendChild(messageItem);
+    // Initial scroll to bottom
     scrollToBottom();
 
-    messageInput.value = '';
-    messageInput.style.height = '24px';
-    messageInput.focus();
+    // Auto-resize input field as user types
+    messageInput.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = (this.scrollHeight < 120 ? this.scrollHeight : 120) + 'px';
+    });
 
-    // Show loading indicator
-    const loadingItem = document.createElement('li');
-    loadingItem.classList.add('message', 'received', 'new-message');
-    loadingItem.innerHTML = `
-        <div class="message-text">
-            <div class="message-sender">
-                <b>AI Assistant</b>
-            </div>
-            <div class="message-content">
-                <div class="typing-indicator">
-                  <span class="dot"></span>
-                  <span class="dot"></span>
-                  <span class="dot"></span>
-                </div>
-            </div>
-        </div>`;
-    messagesList.appendChild(loadingItem);
-    scrollToBottom();
+    // Format timestamp
+    function formatTime() {
+      const now = new Date();
+      return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
 
-    fetch('', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        'csrfmiddlewaretoken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-        'message': message
-      })
-    })
-      .then(response => response.json())
-      .then(data => {
-        // Remove loading indicator
-        messagesList.removeChild(loadingItem);
-        
-        const response = data.response;
-        const time = formatTime();
-        const messageItem = document.createElement('li');
-        messageItem.classList.add('message', 'received', 'new-message');
-        messageItem.innerHTML = `
-        <div class="message-text">
-            <div class="message-sender">
-              <b>AI Assistant</b>
-            </div>
-            <div class="message-content">
-                ${response}
-            </div>
-            <div class="message-footer">${time}</div>
-        </div>`;
-        messagesList.appendChild(messageItem);
-        scrollToBottom();
-      })
-      .catch(error => {
-        // Remove loading indicator and show error
-        messagesList.removeChild(loadingItem);
-        
-        const time = formatTime();
-        const messageItem = document.createElement('li');
-        messageItem.classList.add('message', 'received', 'new-message');
-        messageItem.innerHTML = `
-        <div class="message-text">
-            <div class="message-sender">
-              <b>AI Assistant</b>
-            </div>
-            <div class="message-content">
-                Sorry, I couldn't process your request. Please try again.
-            </div>
-            <div class="message-footer">${time}</div>
-        </div>`;
-        messagesList.appendChild(messageItem);
-        scrollToBottom();
-      });
-  });
-
-  // Add this to enable pressing Enter to send
-  messageInput.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
+    messageForm.addEventListener('submit', (event) => {
       event.preventDefault();
-      messageForm.dispatchEvent(new Event('submit'));
-    }
-  });
 
-  // Auto-focus input on page load
-  window.addEventListener('load', () => {
-    messageInput.focus();
-  });
+      const message = messageInput.value.trim();
+      if (message.length === 0) {
+        return;
+      }
+
+      const time = formatTime();
+      const messageItem = document.createElement('li');
+      messageItem.classList.add('message', 'sent', 'new-message');
+      messageItem.innerHTML = `
+          <div class="message-text">
+              <div class="message-sender">
+                  <b>You</b>
+              </div>
+              <div class="message-content">
+                  ${message}
+              </div>
+              <div class="message-footer">${time}</div>
+          </div>`;
+      messagesList.appendChild(messageItem);
+      scrollToBottom();
+
+      messageInput.value = '';
+      messageInput.style.height = '24px';
+      messageInput.focus();
+
+      // Show loading indicator
+      const loadingItem = document.createElement('li');
+      loadingItem.classList.add('message', 'received', 'new-message');
+      loadingItem.innerHTML = `
+          <div class="message-text">
+              <div class="message-sender">
+                  <b>AI Assistant</b>
+              </div>
+              <div class="message-content">
+                  <div class="typing-indicator">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                  </div>
+              </div>
+          </div>`;
+      messagesList.appendChild(loadingItem);
+      scrollToBottom();
+
+      fetch('', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          'csrfmiddlewaretoken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+          'message': message
+        })
+      })
+        .then(response => response.json())
+        .then(data => {
+          // Remove loading indicator
+          messagesList.removeChild(loadingItem);
+          
+          const response = data.response;
+          const time = formatTime();
+          const messageItem = document.createElement('li');
+          messageItem.classList.add('message', 'received', 'new-message');
+          messageItem.innerHTML = `
+          <div class="message-text">
+              <div class="message-sender">
+                <b>AI Assistant</b>
+              </div>
+              <div class="message-content">
+                  ${response}
+              </div>
+              <div class="message-footer">${time}</div>
+          </div>`;
+          messagesList.appendChild(messageItem);
+          scrollToBottom();
+        })
+        .catch(error => {
+          // Remove loading indicator and show error
+          messagesList.removeChild(loadingItem);
+          
+          const time = formatTime();
+          const messageItem = document.createElement('li');
+          messageItem.classList.add('message', 'received', 'new-message');
+          messageItem.innerHTML = `
+          <div class="message-text">
+              <div class="message-sender">
+                <b>AI Assistant</b>
+              </div>
+              <div class="message-content">
+                  Sorry, I couldn't process your request. Please try again.
+              </div>
+              <div class="message-footer">${time}</div>
+          </div>`;
+          messagesList.appendChild(messageItem);
+          scrollToBottom();
+        });
+    });
+
+    // Add this to enable pressing Enter to send
+    messageInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        messageForm.dispatchEvent(new Event('submit'));
+      }
+    });
+
+    // Auto-focus input on page load
+    window.addEventListener('load', () => {
+      messageInput.focus();
+    });
 </script>
-
 {% endblock %}
