@@ -16,7 +16,7 @@ def signup(request):
             messages.error(request, 'Please correct the errors below.')
     else:
         form = SignupForm()
-    return render(request, 'accounts/signup.html', {'form': form})
+    return render(request, 'signup.html', {'form': form})
 
 def login_view(request):
     if request.method == 'POST':
@@ -33,7 +33,7 @@ def login_view(request):
             messages.error(request, 'Invalid email or password.')
     else:
         form = LoginForm()
-    return render(request, 'accounts/login.html', {'form': form})
+    return render(request, 'login.html', {'form': form})
 
 @login_required
 def logout_view(request):
